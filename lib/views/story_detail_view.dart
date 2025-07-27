@@ -1,4 +1,6 @@
 
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,6 +64,7 @@ class StoryDetailView extends ConsumerWidget {
                     return;
                   }
 
+                  // ignore: avoid_print
                   print('DEBUG: Toggling bookmark for story: ${story.title}');
                   
                   // Show loading feedback

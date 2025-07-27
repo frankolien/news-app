@@ -1,4 +1,6 @@
 // lib/views/widgets/category_cards.dart
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:news_app/core/constants/colors.dart';
 import 'package:news_app/models/source_model.dart';
@@ -8,9 +10,9 @@ class CategoryCards extends StatelessWidget {
   final List<Source> categories;
 
   const CategoryCards({
-    Key? key,
+    super.key,
     required this.categories,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +98,8 @@ class CategoryCards extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               color,
+              // ignore: duplicate_ignore
+              // ignore: deprecated_member_use
               color.withOpacity(0.8),
             ],
             begin: Alignment.topLeft,

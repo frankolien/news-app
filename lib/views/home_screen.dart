@@ -279,7 +279,6 @@ import 'package:news_app/views/widgets/category_card.dart';
 import 'package:news_app/views/widgets/skeleton_shimmer.dart';
 import 'package:news_app/views/widgets/story_card.dart';
 import 'package:news_app/views/widgets/featured_story_card.dart';
-import 'package:news_app/views/widgets/category_chip.dart';
 import 'package:news_app/views/widgets/section_header.dart';
 import '../../viewmodels/home_viewmodel.dart';
 
@@ -520,10 +519,30 @@ Widget _buildCategoriesSection(dynamic homeState) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const SectionHeader(
-        title: "CATEGORIES",
-        icon: Icons.category_outlined,
-      ),
+      Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 4,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF6C5CE7),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "CATEGORIES",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF2D3748),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
       const SizedBox(height: 16),
       
       // Use the new CategoryCards widget
@@ -536,19 +555,32 @@ Widget _buildCategoriesSection(dynamic homeState) {
   Widget _buildTopStoriesSection(dynamic homeState) {
     if (homeState.topStories.isEmpty) return const SizedBox.shrink();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SectionHeader(
-          title: "TOP STORIES",
-          icon: Icons.trending_up,
-        ),
-        const SizedBox(height: 16),
-        FeaturedStoryCard(story: homeState.topStories.first),
-        const SizedBox(height: 24),
-      ],
-    );
+    return  Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 4,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF6C5CE7),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "TOP STORIES",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF2D3748),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
   }
+  
 
   Widget _buildEditorsPickSection(dynamic homeState) {
     if (homeState.editorsPick.isEmpty) return const SizedBox.shrink();
@@ -556,6 +588,7 @@ Widget _buildCategoriesSection(dynamic homeState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
