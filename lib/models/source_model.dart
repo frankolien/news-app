@@ -1,10 +1,9 @@
-// lib/models/source_model.dart
 class Source {
   final int? id;
   final String? name;
   final String? description;
   final String? slug;
-  final int? totalStories; // Added for category data
+  final int? totalStories; // for category data
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -20,7 +19,6 @@ class Source {
 
   factory Source.fromJson(Map<String, dynamic> json) {
     return Source(
-      // Handle both category and regular source formats
       id: json['id'] != null 
           ? int.tryParse(json['id'].toString()) 
           : json['category_id'] != null

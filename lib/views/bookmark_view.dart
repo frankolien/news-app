@@ -1,9 +1,8 @@
-// lib/views/bookmarks_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/models/news_model.dart';
 import 'package:news_app/viewmodels/bookmark_viewmodel.dart';
-//import 'package:news_app/viewmodels/bookmark_viewmodel.dart' show bookmarkNotifierProvider, bookmarkedStoriesProvider, bookmarkCountProvider;
 import 'package:news_app/views/story_detail_view.dart';
 import 'package:news_app/views/widgets/bookmark_story_card.dart';
 

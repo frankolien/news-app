@@ -1,132 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
-/*import 'package:flutter/material.dart';
-import 'package:news_app/models/news_model.dart';
-
-class StoryCard extends StatelessWidget {
-  final NewsModel story;
-  final bool showCategory;
-  final String? categoryText;
-
-  const StoryCard({
-    super.key, 
-    required this.story,
-    this.showCategory = false,
-    this.categoryText,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: () {
-            // Navigate to story details
-            // Navigator.pushNamed(context, '/story-details', arguments: story);
-          },
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image
-              Container(
-                width: 120,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  image: story.urlToImage != null
-                      ? DecorationImage(
-                          image: NetworkImage(story.urlToImage!),
-                          fit: BoxFit.cover,
-                          onError: (error, stackTrace) {
-                            // Handle image loading error
-                          },
-                        )
-                      : null,
-                ),
-                child: story.urlToImage == null
-                    ? const Center(
-                        child: Icon(
-                          Icons.image,
-                          size: 32,
-                          color: Colors.grey,
-                        ),
-                      )
-                    : null,
-              ),
-              
-              // Content
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (showCategory && categoryText != null) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6C5CE7),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            categoryText!,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                      
-                      Text(
-                        story.title ?? 'No Title',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2D3748),
-                          height: 1.3,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      
-                      if (story.author != null) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          'By ${story.author}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}*/
-
-
 import 'package:flutter/material.dart';
 import 'package:news_app/models/news_model.dart';
 import 'package:news_app/views/story_detail_view.dart';
@@ -142,8 +13,6 @@ class StoryCard extends StatelessWidget {
     this.showCategory = false,
     this.categoryText,
   });
-
-  // Generate a consistent color based on story title hash
   Color _getCardColor() {
     final colors = [
       const Color(0xFF6C5CE7),
@@ -170,7 +39,6 @@ class StoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
@@ -182,7 +50,6 @@ class StoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: () {
-            // Navigate to story details
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -193,7 +60,6 @@ class StoryCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Colored accent bar and icon
               Container(
                 width: 80,
                 height: 120,

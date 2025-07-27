@@ -1,4 +1,3 @@
-// lib/models/news_model.dart
 import 'package:news_app/models/source_model.dart';
 
 class NewsModel {

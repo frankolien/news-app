@@ -58,7 +58,7 @@ class CategoryCards extends StatelessWidget {
     
 
     return SizedBox(
-      height: 100,
+      height: 70,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),

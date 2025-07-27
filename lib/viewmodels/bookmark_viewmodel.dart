@@ -1,4 +1,3 @@
-// lib/providers/bookmark_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/core/services/bookmark_service.dart';
 import 'package:news_app/models/news_model.dart';
@@ -13,7 +12,7 @@ final bookmarkedStoriesProvider = FutureProvider<List<NewsModel>>((ref) async {
   return stories;
 });
 
-// Change this to AsyncNotifierProvider for better async handling
+//AsyncNotifierProvider for better async handling
 final bookmarkNotifierProvider = AsyncNotifierProvider<BookmarkNotifier, Set<int>>(() {
   return BookmarkNotifier();
 });
@@ -24,7 +23,7 @@ class BookmarkNotifier extends AsyncNotifier<Set<int>> {
   @override
   Future<Set<int>> build() async {
     print('DEBUG: BookmarkNotifier build() called');
-    // Load initial bookmarked IDs
+    // Loading initial bookmarked IDs
     final bookmarkedStories = await _bookmarkService.getBookmarkedStories();
     final ids = bookmarkedStories.map((story) => story.id!).toSet();
     print('DEBUG: Loaded bookmark IDs: $ids');
@@ -39,7 +38,7 @@ class BookmarkNotifier extends AsyncNotifier<Set<int>> {
 
     print('DEBUG: Toggling bookmark for story ID: ${story.id}, title: ${story.title}');
     
-    // Get current state
+    // Geting current state
     final currentState = state.valueOrNull ?? <int>{};
     
     if (currentState.contains(story.id)) {
@@ -50,7 +49,7 @@ class BookmarkNotifier extends AsyncNotifier<Set<int>> {
         state = AsyncData(newState);
         print('DEBUG: Successfully removed bookmark. New state: $newState');
         
-        // Invalidate the bookmarked stories provider to refresh the list
+        // Invalidating the bookmarked stories provider to refresh the list
         ref.invalidate(bookmarkedStoriesProvider);
       } else {
         print('DEBUG: Failed to remove bookmark from service');
@@ -94,7 +93,6 @@ class BookmarkNotifier extends AsyncNotifier<Set<int>> {
     }
   }
 
-  // Helper method to refresh bookmarks from storage
   Future<void> refresh() async {
     print('DEBUG: Refreshing bookmarks');
     state = const AsyncLoading();
