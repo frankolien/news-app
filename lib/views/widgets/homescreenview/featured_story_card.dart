@@ -35,7 +35,7 @@ class FeaturedStoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: () {
-            // Navigate to story details
+           
             Navigator.push(
               context,
               MaterialPageRoute(

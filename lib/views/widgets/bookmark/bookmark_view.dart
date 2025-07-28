@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/models/news_model.dart';
 import 'package:news_app/viewmodels/bookmark_viewmodel.dart';
 import 'package:news_app/views/story_detail_view.dart';
-import 'package:news_app/views/widgets/bookmark_story_card.dart';
+import 'package:news_app/views/widgets/bookmark/bookmark_story_card.dart';
 
 class BookmarksView extends ConsumerWidget {
   const BookmarksView({super.key});

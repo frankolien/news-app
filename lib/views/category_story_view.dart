@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/models/source_model.dart';
 import 'package:news_app/viewmodels/category_viewmodel.dart';
-import 'package:news_app/views/widgets/skeleton_shimmer.dart';
-import 'package:news_app/views/widgets/story_card.dart';
+import 'package:news_app/views/widgets/homescreenview/skeleton_shimmer.dart';
+import 'package:news_app/views/widgets/homescreenview/story_card.dart';
 class CategoryStoriesView extends ConsumerWidget {
   final Source category;
 

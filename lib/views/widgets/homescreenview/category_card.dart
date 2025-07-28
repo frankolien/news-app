@@ -1,4 +1,3 @@
-// lib/views/widgets/category_cards.dart
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
@@ -6,12 +5,12 @@ import 'package:news_app/core/constants/colors.dart';
 import 'package:news_app/models/source_model.dart';
 import 'package:news_app/views/category_story_view.dart';
 
-class CategoryCards extends StatelessWidget {
+class CategoryCard extends StatelessWidget {
   final List<Source> categories;
 
-  const CategoryCards({
+  const CategoryCard({
     super.key,
-    required this.categories,
+    required this.categories, required category,
   });
 
   @override
@@ -78,7 +77,6 @@ class CategoryCards extends StatelessWidget {
     );
   }
 
-  // Helper method to build individual category cards
   Widget _buildCategoryCard(BuildContext context, Source category, Color color, IconData icon) {
     return GestureDetector(
       onTap: () {

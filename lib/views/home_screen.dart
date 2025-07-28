@@ -1,39 +1,75 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:news_app/views/bookmark_view.dart';
-import 'package:news_app/views/widgets/category_card.dart';
-import 'package:news_app/views/widgets/skeleton_shimmer.dart';
-import 'package:news_app/views/widgets/story_card.dart';
-import 'package:news_app/views/widgets/featured_story_card.dart';
+import 'package:news_app/views/widgets/homescreenview/category_card.dart';
+import 'package:news_app/views/widgets/homescreenview/category_cards.dart';
+import 'package:news_app/views/widgets/homescreenview/error_state.dart';
+import 'package:news_app/views/widgets/homescreenview/featured_story_card.dart';
+import 'package:news_app/views/widgets/homescreenview/home_app_bar.dart';
+import 'package:news_app/views/widgets/homescreenview/home_drawe.dart';
+import 'package:news_app/views/widgets/homescreenview/section_header.dart';
+import 'package:news_app/views/widgets/homescreenview/skeleton_shimmer.dart';
+import 'package:news_app/views/widgets/homescreenview/story_card.dart';
 import '../../viewmodels/home_viewmodel.dart';
+
+// Search providers
+final searchQueryProvider = StateProvider<String>((ref) => '');
+
+final filteredTopStoriesProvider = Provider<List<dynamic>>((ref) {
+  final homeState = ref.watch(homeViewModelProvider);
+  final searchQuery = ref.watch(searchQueryProvider);
+  
+  if (searchQuery.isEmpty) {
+    return homeState.topStories;
+  }
+  
+  return homeState.topStories
+      .where((story) => 
+          (story.title ?? '').toLowerCase().contains(searchQuery.toLowerCase()) ||
+          (story.description ?? '').toLowerCase().contains(searchQuery.toLowerCase()))
+      .toList();
+});
+
+final filteredEditorsPickProvider = Provider<List<dynamic>>((ref) {
+  final homeState = ref.watch(homeViewModelProvider);
+  final searchQuery = ref.watch(searchQueryProvider);
+  
+  if (searchQuery.isEmpty) {
+    return homeState.editorsPick;
+  }
+  
+  return homeState.editorsPick
+      .where((story) => 
+          (story.title ?? '').toLowerCase().contains(searchQuery.toLowerCase()) ||
+          (story.description ?? '').toLowerCase().contains(searchQuery.toLowerCase()))
+      .toList();
+});
+
+final isSearchActiveProvider = Provider<bool>((ref) {
+  final searchQuery = ref.watch(searchQueryProvider);
+  return searchQuery.isNotEmpty;
+});
 
 class HomeView extends ConsumerWidget {
   HomeView({super.key});
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  void openDrawer(BuildContext context) {
-    scaffoldKey.currentState?.openDrawer();
-  }
-
-  void closeDrawer(BuildContext context) {
-    scaffoldKey.currentState?.closeDrawer();
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeViewModelProvider);
-    Size size = MediaQuery.of(context).size;
+    final isSearchActive = ref.watch(isSearchActiveProvider);
 
     return Scaffold(
       key: scaffoldKey,
-      drawer: _buildDrawer(context),
+      drawer: const HomeDrawer(),
       backgroundColor: Colors.grey[50],
-      appBar: _buildAppBar(context),
+      appBar: const HomeAppBar(),
       body: homeState.isLoading
           ? const NewsSkeleton(itemCount: 7)
           : homeState.error != null
-              ? _buildErrorState(ref, homeState.error!)
+              ? ErrorState(
+                  error: homeState.error!,
+                  onRetry: () => ref.refresh(homeViewModelProvider),
+                )
               : RefreshIndicator(
                   onRefresh: () async {
                     ref.refresh(homeViewModelProvider);
@@ -42,11 +78,19 @@ class HomeView extends ConsumerWidget {
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildBannerAd(size),
-                        _buildCategoriesSection(homeState),
-                        _buildTopStoriesSection(homeState),
-                        _buildEditorsPickSection(homeState),
+                        // Replace BannerAd with SearchBar
+                        const SearchBar(),
+                        
+                        // Show search results count if searching
+                        if (isSearchActive) _buildSearchResultsInfo(ref),
+                        
+                        // Only show categories when not searching
+                        if (!isSearchActive) _buildCategoriesSection(homeState),
+                        
+                        _buildTopStoriesSection(ref),
+                        _buildEditorsPickSection(ref),
                         const SizedBox(height: 80),
                       ],
                     ),
@@ -55,337 +99,243 @@ class HomeView extends ConsumerWidget {
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: Column(
+  Widget _buildSearchResultsInfo(WidgetRef ref) {
+    final searchQuery = ref.watch(searchQueryProvider);
+    final filteredTopStories = ref.watch(filteredTopStoriesProvider);
+    final filteredEditorsPick = ref.watch(filteredEditorsPickProvider);
+    final totalResults = filteredTopStories.length + filteredEditorsPick.length;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
         children: [
-          AppBar(
-            title: Image.asset('lib/images/news.png', height: 50),
-            centerTitle: false,
-            backgroundColor: const Color(0xFF2D3748),
-            automaticallyImplyLeading: true,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
+          Icon(Icons.search, color: Colors.grey[600], size: 20),
+          const SizedBox(width: 8),
           Expanded(
-            child: ListView(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.dashboard),
-                  title: const Text('Dashboard'),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.analytics),
-                  title: const Text('Analytics'),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.notifications),
-                  title: const Text('Notifications'),
-                  trailing: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      '3',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.bookmark),
-                  title: const Text('Bookmarks'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const BookmarksView()),
-                    );
-                  },
-                ),
-              ],
+            child: Text(
+              'Found $totalResults result${totalResults != 1 ? 's' : ''} for "$searchQuery"',
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: const Color(0xFF2D3748),
-      leadingWidth: double.infinity,
-      leading: Builder(
-        builder: (context) => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.search, color: Colors.white),
-                ),
-                Image.asset('lib/images/news.png', height: 50),
-              ],
-            ),
-            IconButton(
-              icon: const Icon(Icons.person_outline, color: Colors.white),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BookmarksView()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorState(WidgetRef ref, String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            'Error loading news',
-            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            error,
-            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
-              ref.refresh(homeViewModelProvider);
+              ref.read(searchQueryProvider.notifier).state = '';
             },
-            child: const Text('Retry'),
+            child: const Text(
+              'Clear',
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBannerAd(Size size) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      height: size.height * 0.08,
-      decoration: BoxDecoration(
-        color: const Color(0xFF2D3748),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Image.asset('assets/images/advert.png', height: 60),
-      ),
-    );
-  }
-
-  // Updated _buildCategoriesSection method for home_view.dart
-// Don't forget to add the import at the top of your home_view.dart file:
-// import 'package:news_app/views/widgets/category_cards.dart';
-
-Widget _buildCategoriesSection(dynamic homeState) {
-  print('=== CATEGORIES DEBUG ===');
-  print('homeState type: ${homeState.runtimeType}');
-  print('Total categories from API: ${homeState.categories?.length ?? 'null'}');
+  Widget _buildCategoriesSection(dynamic homeState) {
+    print('=== CATEGORIES DEBUG ===');
+    print('homeState type: ${homeState.runtimeType}');
+    print('Total categories from API: ${homeState.categories?.length ?? 'null'}');
+    
+    // Check if categories is null or empty
+    if (homeState.categories == null) {
+      print('Categories is null!');
+      return const SizedBox.shrink();
+    }
+    
+    if (homeState.categories.length == 0) {
+      print('Categories is empty!');
+      return const SizedBox.shrink();
+    }
+    
+    // Debug: Print all categories
+    for (int i = 0; i < homeState.categories.length; i++) {
+      final cat = homeState.categories[i];
+      print('Category $i: id=${cat.id}, name=${cat.name}');
+    }
+    
+    // Filter out categories that don't have valid IDs
+    final validCategories = homeState.categories
+        .where((category) => category.id != null)
+        .toList();
   
-  // Check if categories is null or empty
-  if (homeState.categories == null) {
-    print('Categories is null!');
-    return const SizedBox.shrink();
-  }
-  
-  if (homeState.categories.length == 0) {
-    print('Categories is empty!');
-    return const SizedBox.shrink();
-  }
-  
-  // Debug: Print all categories
-  for (int i = 0; i < homeState.categories.length; i++) {
-    final cat = homeState.categories[i];
-    print('Category $i: id=${cat.id}, name=${cat.name}');
-  }
-  
-  // Filter out categories that don't have valid IDs
-  final validCategories = homeState.categories
-      .where((category) => category.id != null)
-      .toList();
-  
-  print('Valid categories after filtering: ${validCategories.length}');
-  print('========================');
-  
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 4,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF6C5CE7),
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                const Text(
-                                  "CATEGORIES",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2D3748),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-      const SizedBox(height: 16),
-      
-      // Use the new CategoryCards widget
-      CategoryCards(categories: validCategories),
-      
-      const SizedBox(height: 24),
-    ],
-  );
-}
-  Widget _buildTopStoriesSection(dynamic homeState) {
-    if (homeState.topStories.isEmpty) return const SizedBox.shrink();
-
-    return  Column(
-      children:[ 
-        Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 4,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF6C5CE7),
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  const Text(
-                                    "TOP STORIES",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF2D3748),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader(title: "CATEGORIES"),
         const SizedBox(height: 16),
-        FeaturedStoryCard(story: homeState.topStories.first),
-                            ]
+        CategoryCard(categories: validCategories, category: null,),
+        const SizedBox(height: 24),
+      ],
     );
   }
-  
 
-  Widget _buildEditorsPickSection(dynamic homeState) {
-    if (homeState.editorsPick.isEmpty) return const SizedBox.shrink();
+  Widget _buildTopStoriesSection(WidgetRef ref) {
+    final filteredTopStories = ref.watch(filteredTopStoriesProvider);
+    final isSearchActive = ref.watch(isSearchActiveProvider);
+
+    if (filteredTopStories.isEmpty) {
+      if (isSearchActive) {
+        return const SizedBox.shrink(); // Don't show empty state during search
+      }
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        const SectionHeader(title: "TOP STORIES"),
+        const SizedBox(height: 16),
+        // Show all filtered stories during search, otherwise just the first one
+        if (isSearchActive) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                for (int i = 0; i < filteredTopStories.length; i++) ...[
+                  StoryCard(
+                    story: filteredTopStories[i],
+                    showCategory: true,
+                    categoryText: "TOP STORY",
+                  ),
+                  if (i < filteredTopStories.length - 1) const SizedBox(height: 16),
+                ],
+              ],
+            ),
+          ),
+        ] else ...[
+          FeaturedStoryCard(story: filteredTopStories.first),
+        ],
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildEditorsPickSection(WidgetRef ref) {
+    final filteredEditorsPick = ref.watch(filteredEditorsPickProvider);
+    final isSearchActive = ref.watch(isSearchActiveProvider);
+
+    if (filteredEditorsPick.isEmpty) {
+      if (isSearchActive) {
+        return const SizedBox.shrink(); // Don't show empty state during search
+      }
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 16),
-          Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 4,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF6C5CE7),
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  const Text(
-                                    "EDITOR'S PICK",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF2D3748),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
         const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE91E63),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  "LATEST TODAY",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+        const SectionHeader(title: "EDITOR'S PICK"),
+        const SizedBox(height: 16),
+        if (!isSearchActive) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE91E63),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                "LATEST TODAY",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+        // Use a simple Column with manual spacing
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              for (int i = 0; i < filteredEditorsPick.length; i++) ...[
+                StoryCard(
+                  story: filteredEditorsPick[i],
+                  showCategory: true,
+                  categoryText: isSearchActive ? "EDITOR'S PICK" : "NEWS TODAY",
+                ),
+                if (i < filteredEditorsPick.length - 1) const SizedBox(height: 16),
+              ],
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: homeState.editorsPick.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 16),
-          itemBuilder: (context, index) {
-            return StoryCard(
-              story: homeState.editorsPick[index],
-              showCategory: true,
-              categoryText: "NEWS TODAY",
-            );
-          },
-        ),
         const SizedBox(height: 24),
       ],
+    );
+  }
+}
+
+// Custom SearchBar widget
+class SearchBar extends ConsumerWidget {
+  const SearchBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchQuery = ref.watch(searchQueryProvider);
+
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        onChanged: (value) {
+          ref.read(searchQueryProvider.notifier).state = value;
+        },
+        decoration: InputDecoration(
+          hintText: 'Search stories by title...',
+          hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 16,
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: Colors.grey[600],
+            size: 24,
+          ),
+          suffixIcon: searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: Icon(
+                    Icons.clear,
+                    color: Colors.grey[600],
+                  ),
+                  onPressed: () {
+                    ref.read(searchQueryProvider.notifier).state = '';
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
+        ),
+        style: const TextStyle(
+          fontSize: 16,
+          color: Colors.black87,
+        ),
+      ),
     );
   }
 }
