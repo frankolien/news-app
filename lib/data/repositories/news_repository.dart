@@ -13,12 +13,10 @@ class NewsRepository {
   
   NewsRepository(this._api);
   
-  // Helper method to extract list data from API response
   List<Map<String, dynamic>> _extractListFromResponse(dynamic res) {
     if (res is List) {
       return res.cast<Map<String, dynamic>>();
     } else if (res is Map) {
-      // Handle the specific API structure: {message: "", data: {data: [...]}}
       if (res.containsKey('data') && res['data'] is Map) {
         final dataMap = res['data'] as Map;
         if (dataMap.containsKey('data') && dataMap['data'] is List) {
@@ -51,7 +49,7 @@ class NewsRepository {
     if (res is List) {
       return res.cast<Map<String, dynamic>>();
     } else if (res is Map) {
-      // Handle the specific categories API structure: {message: "", data: {data: [...]}}
+      // ...for handling the specific categories Api structure: {message: "", data: {data: [...]}}
       if (res.containsKey('data') && res['data'] is Map) {
         final dataMap = res['data'] as Map;
         if (dataMap.containsKey('data') && dataMap['data'] is List) {
@@ -60,13 +58,13 @@ class NewsRepository {
         }
       }
       
-      // Try other common API response patterns
-      final possibleKeys = ['data', 'items', 'results', 'categories'];
+      // ..anohther API response patterns
+      /*final possibleKeys = ['data', 'items', 'results', 'categories'];
       for (String key in possibleKeys) {
         if (res.containsKey(key) && res[key] is List) {
           return (res[key] as List).cast<Map<String, dynamic>>();
         }
-      }
+      }*/
       
       print('Categories response structure: ${res.keys}');
     }
@@ -79,15 +77,17 @@ class NewsRepository {
       res = await _api.get('/api/general/categories');
       print('Categories API response: $res'); // Debug log
       
-      // Use the special categories extraction method
+      // ...using the special categories extraction method
       final listData = _extractCategoriesFromResponse(res);
+
       print('Extracted ${listData.length} categories'); // Debug log
       
       if (listData.isNotEmpty) {
-        print('First category raw data: ${listData.first}'); // Debug log
+        // Debug log
+        print('First category raw data: ${listData.first}'); 
       }
       
-      // Parse categories with better error handling
+      // ...parsing the categories
       final validCategories = <Source>[];
       for (var categoryData in listData) {
         try {
@@ -184,10 +184,12 @@ class NewsRepository {
   
   Future<List<NewsModel>> fetchStoriesByCategory(int categoryId) async {
     try {
-      print('Fetching stories for category ID: $categoryId'); // Debug log
+      // Debug log
+      print('Fetching stories for category ID: $categoryId'); 
       final res = await _api.get('/api/general/categories/$categoryId/stories?page=1&per_page=15');
       final listData = _extractListFromResponse(res);
-      print('Found ${listData.length} stories for category $categoryId'); // Debug log
+      // Debug log
+      print('Found ${listData.length} stories for category $categoryId'); 
       return listData.map((e) => NewsModel.fromJson(e)).toList();
     } catch (e) {
       print('Error fetching stories by category: $e');
@@ -199,13 +201,13 @@ class NewsRepository {
     try {
       final res = await _api.get('/api/general/stories/$storyId');
       if (res is Map<String, dynamic>) {
-        // Check if the story data is nested under a key
+        // function to check if the story data is nested under a key
         if (res.containsKey('data') && res['data'] is Map) {
           return NewsModel.fromJson(res['data'] as Map<String, dynamic>);
         } else if (res.containsKey('story') && res['story'] is Map) {
           return NewsModel.fromJson(res['story'] as Map<String, dynamic>);
         } else {
-          // Assume the map itself is the story data
+          // ... to Assume the map itself is the story data
           return NewsModel.fromJson(res);
         }
       }

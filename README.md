@@ -29,7 +29,7 @@ A modern, feature-rich news application built with Flutter that provides users w
 
 <div align="center">
   <img src="screenshots/drawer.png" alt="Drawer" width="300"/>
-  <img src="screenshots/editor's pick.png" alt="Editor's Pick" width="300"/>
+  <img src="screenshots/editor's pick.png" alt="Editor's" width="300"/>
 </div>
 
 ## Getting Started

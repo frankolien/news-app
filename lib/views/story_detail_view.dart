@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/models/news_model.dart';
 
-import 'package:news_app/viewmodels/bookmark_viewmodel.dart'; // Use your unified bookmark provider
+import 'package:news_app/storage/repositories/bookmark_viewmodel.dart';
 
 class StoryDetailView extends ConsumerWidget {
   final NewsModel story;
@@ -15,7 +15,7 @@ class StoryDetailView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Use the unified bookmark system
+    // ..using the unified bookmark system
     final bookmarkState = ref.watch(bookmarkNotifierProvider);
     final isBookmarked = bookmarkState.when(
       data: (bookmarks) => story.id != null ? bookmarks.contains(story.id!) : false,
@@ -44,7 +44,7 @@ class StoryDetailView extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.share, color: Colors.white),
                 onPressed: () {
-                  // Share functionality
+                
                 },
               ),
               IconButton(
@@ -180,7 +180,7 @@ class StoryDetailView extends ConsumerWidget {
                       Text(
                         story.title ?? 'No Title',
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           height: 1.2,

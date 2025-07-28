@@ -43,7 +43,7 @@ class BookmarkService {
     }
   }
 
-  // Add a story to bookmarks
+  // function yo add a story to bookmarks
   Future<bool> addBookmark(NewsModel story) async {
     try {
       print('DEBUG: BookmarkService.addBookmark() called for story: ${story.title} (ID: ${story.id})');
@@ -57,7 +57,7 @@ class BookmarkService {
       final bookmarksJson = prefs.getStringList(_bookmarksKey) ?? [];
       print('DEBUG: Current bookmarks count: ${bookmarksJson.length}');
 
-      // Check if already bookmarked
+      // function to check if already bookmarked
       final isAlreadyBookmarked = bookmarksJson.any((jsonString) {
         try {
           final Map<String, dynamic> json = jsonDecode(jsonString);
@@ -73,12 +73,12 @@ class BookmarkService {
         return false;
       }
 
-      // Convert story to JSON and validate
+      // convert story to JSON and validate
       final storyJson = story.toJson();
       final storyJsonString = jsonEncode(storyJson);
       print('DEBUG: Story JSON: ${storyJsonString.substring(0, 200)}...');
 
-      // Validate that we can parse it back
+      // validate that we can parse it back
       try {
         final testParse = NewsModel.fromJson(jsonDecode(storyJsonString));
         print('DEBUG: JSON validation successful: ${testParse.title}');
@@ -102,7 +102,7 @@ class BookmarkService {
     }
   }
 
-  // Remove a story from bookmarks
+  // function to remove a story from bookmarks
   Future<bool> removeBookmark(int storyId) async {
     try {
       print('DEBUG: BookmarkService.removeBookmark() called for ID: $storyId');
@@ -140,7 +140,7 @@ class BookmarkService {
     }
   }
 
-  // Check if a story is bookmarked
+  // function to check if a story is bookmarked
   Future<bool> isBookmarked(int storyId) async {
     try {
       print('DEBUG: BookmarkService.isBookmarked() called for ID: $storyId');
@@ -165,7 +165,7 @@ class BookmarkService {
     }
   }
 
-  // Clear all bookmarks
+  // function to claer  all bookmarks
   Future<bool> clearAllBookmarks() async {
     try {
       print('DEBUG: BookmarkService.clearAllBookmarks() called');
@@ -173,7 +173,7 @@ class BookmarkService {
       await prefs.remove(_bookmarksKey);
       print('DEBUG: Successfully cleared all bookmarks');
       
-      // Verify it was cleared
+      // function to check if it was cleared
       final verifyList = prefs.getStringList(_bookmarksKey) ?? [];
       print('DEBUG: Verification - storage now contains ${verifyList.length} bookmarks');
       

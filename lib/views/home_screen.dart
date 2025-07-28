@@ -80,10 +80,8 @@ class HomeView extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Replace BannerAd with SearchBar
                         const SearchBar(),
                         
-                        // Show search results count if searching
                         if (isSearchActive) _buildSearchResultsInfo(ref),
                         
                         // Only show categories when not searching

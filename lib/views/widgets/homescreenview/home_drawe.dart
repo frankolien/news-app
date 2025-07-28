@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/views/search_page.dart';
 import 'package:news_app/views/widgets/bookmark/bookmark_view.dart';
 
 class HomeDrawer extends StatelessWidget {
@@ -29,7 +28,7 @@ class HomeDrawer extends StatelessWidget {
                   leading: const Icon(Icons.dashboard),
                   title: const Text('Dashboard'),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> const FollowingPage()));
+                    Navigator.pop(context);
                   },
                 ),
                 ListTile(
