@@ -45,7 +45,7 @@ A modern, feature-rich news application built with Flutter that provides users w
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/flutter-news-app.git
+   git clone https://github.com/frankolien/flutter-news-app.git
    cd flutter-news-app
    ```
 
